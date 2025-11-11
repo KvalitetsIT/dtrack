@@ -73,7 +73,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           sbom: true
-          attests: true
           file: Dockerfile
 
       - name: install cosign
