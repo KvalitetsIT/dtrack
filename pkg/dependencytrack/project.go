@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack/client"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client"
 )
 
 type Project struct {

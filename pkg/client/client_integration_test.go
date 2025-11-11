@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/KvalitetsIT/dtrack/pkg/client/test"
 	"github.com/in-toto/in-toto-golang/in_toto"
-	"github.com/nais/dependencytrack/pkg/client/test"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )

@@ -8,7 +8,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack/client"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client"
 	mock "github.com/stretchr/testify/mock"
 )
 

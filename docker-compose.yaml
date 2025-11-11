@@ -56,7 +56,7 @@ services:
 
   bootstrap:
     platform: linux/amd64
-    image: europe-north1-docker.pkg.dev/nais-io/nais/images/dependencytrack-bootstrap:latest
+    build: .
     environment:
       - BASE_URL=http://dtrack-apiserver:8080/
       - DEFAULT_ADMIN_PASSWORD=admin

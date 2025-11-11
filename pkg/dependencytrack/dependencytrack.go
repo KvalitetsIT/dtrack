@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack/auth"
-	"github.com/nais/dependencytrack/pkg/dependencytrack/client"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/auth"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client"
 	"github.com/sirupsen/logrus"
 )
 
-const EmailPostfix = "@nais.io"
+const EmailPostfix = "@kvalitetsit.dk"
 
 var _ Client = &dependencyTrackClient{}
 

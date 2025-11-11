@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nais/dependencytrack/pkg/client/auth"
-	"github.com/nais/dependencytrack/pkg/httpclient"
+	"github.com/KvalitetsIT/dtrack/pkg/client/auth"
+	"github.com/KvalitetsIT/dtrack/pkg/httpclient"
 	log "github.com/sirupsen/logrus"
 )
 
-const EmailPostfix = "@nais.io"
+const EmailPostfix = "@kvalitetsit.dk"
 
 type Client interface {
 	AddToTeam(ctx context.Context, username, uuid string) error

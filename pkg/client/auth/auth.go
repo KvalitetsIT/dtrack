@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/KvalitetsIT/dtrack/pkg/httpclient"
 	"github.com/lestrrat-go/jwx/v2/jwt"
-	"github.com/nais/dependencytrack/pkg/httpclient"
 	"github.com/sirupsen/logrus"
 )
 

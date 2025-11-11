@@ -6,10 +6,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/KvalitetsIT/dtrack/internal/dependencytrack"
+	"github.com/KvalitetsIT/dtrack/internal/http"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/nais/dependencytrack/internal/dependencytrack"
-	"github.com/nais/dependencytrack/internal/http"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )

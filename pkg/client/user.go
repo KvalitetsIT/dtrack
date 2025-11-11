@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/nais/dependencytrack/pkg/httpclient"
+	"github.com/KvalitetsIT/dtrack/pkg/httpclient"
 	log "github.com/sirupsen/logrus"
 )
 

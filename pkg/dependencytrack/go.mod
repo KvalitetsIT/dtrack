@@ -1,4 +1,4 @@
-module github.com/nais/dependencytrack/pkg/dependencytrack
+module github.com/KvalitetsIT/dtrack/pkg/dependencytrack
 
 go 1.25.3
 
