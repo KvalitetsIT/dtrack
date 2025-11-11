@@ -3,13 +3,13 @@ module github.com/KvalitetsIT/dtrack
 go 1.25.3
 
 require (
+	github.com/KvalitetsIT/dtrack/pkg/dependencytrack v0.0.0-20251110040821-bcbd2680db78
 	github.com/gin-gonic/gin v1.11.0
 	github.com/google/uuid v1.6.0
 	github.com/in-toto/in-toto-golang v0.9.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lestrrat-go/jwx/v2 v2.1.6
-	github.com/KvalitetsIT/dtrack/pkg/dependencytrack v0.0.0-20251110040821-bcbd2680db78
 	github.com/ory/dockertest/v3 v3.12.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/prometheus/client_golang v1.23.2
@@ -133,4 +133,4 @@ require (
 // Replace the dependencytrack package with a local version for development
 // This is useful when you want to test changes in the dependencytrack package without pushing to a remote repository
 // This line should be removed or commented out when building for production
-// replace github.com/KvalitetsIT/dtrack/pkg/dependencytrack => ./pkg/dependencytrack
+replace github.com/KvalitetsIT/dtrack/pkg/dependencytrack => ./pkg/dependencytrack

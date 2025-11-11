@@ -56,7 +56,7 @@ services:
 
   bootstrap:
     platform: linux/amd64
-    image: .
+    build: .
     environment:
       - BASE_URL=http://dtrack-apiserver:8080/
       - DEFAULT_ADMIN_PASSWORD=admin
