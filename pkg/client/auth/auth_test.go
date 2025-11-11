@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/nais/dependencytrack/pkg/client/test"
-	"github.com/nais/dependencytrack/pkg/httpclient"
+	"github.com/KvalitetsIT/dtrack/pkg/client/test"
+	"github.com/KvalitetsIT/dtrack/pkg/httpclient"
 	"github.com/stretchr/testify/assert"
 )
 

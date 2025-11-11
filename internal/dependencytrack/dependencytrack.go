@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nais/dependencytrack/internal/observability"
-	"github.com/nais/dependencytrack/pkg/client"
+	"github.com/KvalitetsIT/dtrack/internal/observability"
+	"github.com/KvalitetsIT/dtrack/pkg/client"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )

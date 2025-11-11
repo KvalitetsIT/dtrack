@@ -1,60 +1,52 @@
-# dependencytrack
+# dtrack
 
 [Dependencytrack](https://dependencytrack.org/) is a tool for scanning dependencies for vulnerabilities.
 
-NAIS oversees the maintenance of this repository, which includes:
+> [!WARNING]
+> This repository is a **hard fork** of the original NAIS repository. The original repository can be found at
+> [https://github.com/nais/dependencytrack](https://github.com/nais/dependencytrack).
+>
+> **Breaking Changes**: This fork modifies the Go module path. We do not maintain compatibility with the upstream repository.
 
-* helm charts
-* pre-installed & post-install bootstrap configuration
-* Stateful set for persistence and no down-time deployments
+KvalitetsIT maintains this hard fork with customizations for internal use, including helm charts, bootstrap configuration, stateful deployments, and a modified Go module.
 
-## Dependencytrack client
+## Using the Dependencytrack Client
 
-The repository houses a client for dependencytrack, facilitating its usage for implementations. Please feel free to
-expand the client interface with additional functionality as required. To update to the most recent version of the
-client, execute:
+The repository provides a client for dependencytrack, enabling integrations and custom implementations. To add the client to your project, run:
 
-`go get -u github.com/nais/dependencytrack@HEAD`
-
-## Local development
-
-### Prerequisites
-
-First `asdf install`
-
-Run your local instance of dependencytrack with the following command:
-`make compose`
-
-A docker-compose file is available for local development. Please duplicate .env.sample as .env and provide the necessary
-values. The users.yaml file allows for the creation of pre-installed users for automated testing purposes. You can
-access the [dependencytrack UI](http://localhost:9000).
-
-The API is available at [depdendencytrack-api](http://localhost:9001).
-
-### Swagger
-
-The [swagger UI](http://localhost:9002) is bundled with the docker-compose file.
-
-## Verifying the image and its contents
-
-The image is signed "keylessly" (is that a word?) using Sigstore cosign. To verify its authenticity run
-
-```
-cosign verify \
---certificate-identity "https://github.com/nais/depedencytrack/.github/workflows/main.yaml@refs/heads/main" \
---certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-europe-north1-docker.pkg.dev/nais-io/nais/images/dependencytrack@sha256:<shasum>
+```bash
+go get -u github.com/KvalitetsIT/dtrack@HEAD
 ```
 
-The images are also attested with SBOMs in the CycloneDX format. You can verify these by running
+Feel free to expand the client interface with additional functionality as needed.
 
+## Local Development
+
+### Getting Started
+
+Start a local dependencytrack environment:
+
+```bash
+make compose
 ```
-cosign verify-attestation --type cyclonedx \
---certificate-identity "https://github.com/nais/depedencytrack/.github/workflows/main.yaml@refs/heads/main" \
---certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-europe-north1-docker.pkg.dev/nais-io/nais/images/dependencytrack@sha256:<shasum>
-```
+
+This starts a Docker Compose setup with dependencytrack. Configuration is managed via:
+- `.env` - Copy from `.env.sample` and configure with your values
+- `users.yaml` - Define pre-installed test users for automated testing
+
+**Access points:**
+- [Dependencytrack UI](http://localhost:9000) - Web interface
+- [Dependencytrack API](http://localhost:9001) - REST API
+- [Swagger UI](http://localhost:9002) - API documentation
+
+### Development Workflow
+
+1. Set up your `.env` file from `.env.sample`
+2. Configure test users in `users.yaml` if needed
+3. Run `make compose` to start services
+4. Make changes to the codebase
+5. Services will reload automatically or restart with `make compose`
 
 ## License
 
-nais/Dependencytrack is licensed under the MIT License, see [LICENSE.md](/LICENSE.md).
+This project is licensed under the MIT License, see [LICENSE.md](/LICENSE.md). It is derived from [nais/dependencytrack](https://github.com/nais/dependencytrack), also licensed under MIT.

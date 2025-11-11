@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack"
 	uuid "github.com/google/uuid"
 	"github.com/in-toto/in-toto-golang/in_toto"
-	"github.com/nais/dependencytrack/pkg/dependencytrack"
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	log "github.com/sirupsen/logrus"

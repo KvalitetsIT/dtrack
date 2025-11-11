@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack"
 	"github.com/stretchr/testify/assert"
 )
 

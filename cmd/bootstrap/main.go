@@ -8,8 +8,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/nais/dependencytrack/cmd/common"
-	"github.com/nais/dependencytrack/pkg/dependencytrack"
+	"github.com/KvalitetsIT/dtrack/cmd/common"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack/auth"
-	"github.com/nais/dependencytrack/pkg/dependencytrack/client"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/auth"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client"
 	log "github.com/sirupsen/logrus"
 )
 

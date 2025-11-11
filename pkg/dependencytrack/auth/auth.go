@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client"
 	"github.com/lestrrat-go/jwx/v2/jwt"
-	"github.com/nais/dependencytrack/pkg/dependencytrack/client"
 	"github.com/sirupsen/logrus"
 )
 

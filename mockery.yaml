@@ -4,14 +4,14 @@ force-file-write: true
 template-data:
   unroll-variadic: true
 packages:
-  github.com/nais/dependencytrack/pkg/dependencytrack/client:
+  github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client:
     config:
       dir: ./pkg/dependencytracktest/clientmock
       pkgname: clientmock
       include-interface-regex: .*API
       include-auto-generated: true
 
-  github.com/nais/dependencytrack/pkg/dependencytrack:
+  github.com/KvalitetsIT/dtrack/pkg/dependencytrack:
     config:
       dir: ./pkg/dependencytracktest
       pkgname: dependencytracktest

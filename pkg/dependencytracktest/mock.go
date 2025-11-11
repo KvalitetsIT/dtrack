@@ -7,8 +7,8 @@ package dependencytracktest
 import (
 	"context"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack"
-	"github.com/nais/dependencytrack/pkg/dependencytrack/auth"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/auth"
 	mock "github.com/stretchr/testify/mock"
 )
 

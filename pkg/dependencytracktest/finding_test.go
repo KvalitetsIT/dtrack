@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack/client"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack/client"
 	"github.com/stretchr/testify/assert"
 )
 

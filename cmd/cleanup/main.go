@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/KvalitetsIT/dtrack/pkg/client"
 	"github.com/joho/godotenv"
-	"github.com/nais/dependencytrack/pkg/client"
 	log "github.com/sirupsen/logrus"
 )
 

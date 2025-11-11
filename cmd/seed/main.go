@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nais/dependencytrack/pkg/dependencytrack"
+	"github.com/KvalitetsIT/dtrack/pkg/dependencytrack"
 	log "github.com/sirupsen/logrus"
 )
 
