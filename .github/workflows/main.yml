@@ -81,12 +81,12 @@ jobs:
 
       - name: sign image
         env:
-          IMAGE_REF: docker.io/kvalitetsit/dtrack-bootstrap:${{ steps.build_push.outputs.digest}}
+          IMAGE_REF: docker.io/kvalitetsit/dtrack-bootstrap@${{ steps.build_push.outputs.digest}}
         run: |
           cosign sign --yes ${IMAGE_REF}
 
       - name: verify signature
         env:
-          IMAGE_REF: docker.io/kvalitetsit/dtrack-bootstrap:${{ steps.build_push.outputs.digest}}
+          IMAGE_REF: docker.io/kvalitetsit/dtrack-bootstrap@${{ steps.build_push.outputs.digest}}
         run: |
           cosign verify ${IMAGE_REF}
