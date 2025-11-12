@@ -144,4 +144,6 @@ jobs:
           ls -la dtrack
           git status
 
+          git push
+
 
