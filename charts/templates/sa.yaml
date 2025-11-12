@@ -5,6 +5,4 @@ metadata:
   name: {{ include "dependencytrack.name" . }}
   labels:
     {{- include "dependencytrack-backend.labels" . | nindent 4 }}
-  annotations:
-    iam.gke.io/gcp-service-account: {{ .Values.backend.serviceAccount.googleServiceAccountEmail }}
-    {{- end }}
+{{- end }}

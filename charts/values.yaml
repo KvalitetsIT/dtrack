@@ -3,8 +3,8 @@
 # Declare variables to be passed into your templates.
 bootstrap:
   image:
-    name: dependencytrack-bootstrap
-    repository: europe-north1-docker.pkg.dev/nais-io/nais/images
+    name: dtrack-bootstrap
+    repository: docker.io/kvalitetsit/dtrack-bootstrap
     tag: yolo
   logLevel: INFO
   baseUrl: http://dependencytrack-backend:8080/api
@@ -40,7 +40,6 @@ backend:
       memory: 4Gi
       cpu: "1"
   outbound: []
-  ingressClassName: nais-ingress
   ingress:
   livenessProbe:
     enabled: true
@@ -59,10 +58,6 @@ backend:
     successThreshold: 1
     failureThreshold: 3
 
-  cloudProxy:
-    repository: eu.gcr.io/cloud-sql-connectors/cloud-sql-proxy
-    tag: 2.18.2
-
   postgresql:
     enabled: true
     password:
@@ -75,7 +70,6 @@ backend:
 
   serviceAccount:
     create: true
-    googleServiceAccountEmail:
 
   persistence:
     accessMode: ReadWriteOnce
@@ -121,12 +115,8 @@ frontend:
       memory: 256Mi
       cpu: "1"
   outbound: []
-  ingressClassName: nais-ingress
   ingress:
   env:
-    # auth code flow without client_secret using pkce not supported by google.
-    # https://stackoverflow.com/questions/60724690/using-google-oidc-with-code-flow-and-pkce
-    # OIDC_FLOW: implicit
     API_BASE_URL:
     OIDC_ISSUER:
     OIDC_CLIENT_ID:
@@ -146,11 +136,3 @@ trivy:
     capabilities:
       drop:
         - ALL
-
-metrics:
-  image:
-    name: dependencytrack-metrics
-    repository: europe-north1-docker.pkg.dev/nais-io/nais/images
-    tag: latest
-  tenant: nais
-  imagesIgnore: "nais-io/nais/images/clamav,nais-io/nais/images/wonderwall,nais-io/nais/images/elector"
