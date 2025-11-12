@@ -58,7 +58,7 @@ services:
     platform: linux/amd64
     build: .
     environment:
-      - BASE_URL=http://dtrack-apiserver:8080/
+      - BASE_URL=http://dtrack-apiserver:8080/api
       - DEFAULT_ADMIN_PASSWORD=admin
       - ADMIN_PASSWORD=yolo
       - TRIVY_API_TOKEN=my-token

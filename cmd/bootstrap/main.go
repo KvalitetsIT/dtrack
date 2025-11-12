@@ -66,6 +66,17 @@ func main() {
 		log.Fatalf("create dependencytrack client: %v", err)
 	}
 
+	version, err := c.Version(ctx)
+	if err != nil {
+		log.Fatalf("get dependencytrack version: %v", err)
+	}
+
+	if strings.TrimSpace(version) == "" {
+		log.Fatalf("dependencytrack version is empty, is the server up?")
+	}
+
+	log.Infof("dependencytrack version: %s", version)
+
 	err = c.ChangeAdminPassword(ctx, cfg.DefaultAdminPassword, cfg.AdminPassword)
 	if err != nil {
 		log.Fatalf("change admin password: %v", err)
@@ -82,6 +93,13 @@ func main() {
 	err = yaml.Unmarshal(file, users)
 	if err != nil {
 		log.Fatalf("unmarshal users file: %v", err)
+	}
+
+	for _, u := range users.Users {
+		log.Info("User: ", u.Username)
+		if u.Password == "" {
+			log.Fatalf("user %s has no password", u.Username)
+		}
 	}
 
 	team, err := c.GetTeam(ctx, "Administrators")
