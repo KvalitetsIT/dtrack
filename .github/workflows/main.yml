@@ -140,8 +140,8 @@ jobs:
           git commit -m "Adding new dtrack chart"
 
           echo "Verify changes before pushing:"
-          ls -la helm-repo
-          ls -la helm-repo/dtrack
+          ls -la
+          ls -la dtrack
           git status
 
 
