@@ -133,7 +133,7 @@ jobs:
       - name: Update and push Helm repo
         run: |
           mkdir -p helm-repo/dtrack
-          cp dependencytrack-*.tgz helm-repo/dtrack/
+          cp dtrack-*.tgz helm-repo/dtrack/
           cd helm-repo
           helm repo index . --url https://raw.githubusercontent.com/KvalitetsIT/helm-repo/master/
           git add -A
