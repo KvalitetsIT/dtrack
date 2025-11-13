@@ -63,13 +63,13 @@ spec:
             - name: ALPINE_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dependencytrack-backend.name" . }}-postgresql
-                  key: postgresql_password
+                  name: {{ required "PostgreSQL password secret name is required" .Values.backend.postgresql.passwordSecret.name }}
+                  key: {{ required "PostgreSQL password secret key is required" .Values.backend.postgresql.passwordSecret.key }}
             - name: ALPINE_DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dependencytrack-backend.name" . }}-postgresql
-                  key: postgresql_username
+                  name: {{ required "PostgreSQL username secret name is required" .Values.backend.postgresql.usernameSecret.name }}
+                  key: {{ required "PostgreSQL username secret key is required" .Values.backend.postgresql.usernameSecret.key }}
             - name: ALPINE_SECRET_KEY_PATH
               value: /var/run/secrets/secret.key
             {{- end }}

@@ -1,30 +1,42 @@
-# Default values for dependencytrack.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 bootstrap:
+  enabled: true
+  logLevel: INFO
+
   image:
     name: dtrack-bootstrap
     repository: docker.io/kvalitetsit/dtrack-bootstrap
     tag: yolo
-  logLevel: INFO
+
   baseUrl: http://dependencytrack-backend:8080/api
   frontendBaseUrl:
+
   defaultAdminPassword: admin
-  adminPassword: todo
+  adminPasswordSecret:
+    name: dtrack-bootstrap
+    key: admin-password
+
   github:
-    advisory_mirroring_token:
+    advisoryMirroringTokenSecret:
+      name:
+      key:
+
   google:
     osv_enabled: true
-  users:
-    - username: console
-      password: todo
+
+  users: []
+
   trivy:
     ignore_unfixed: true
-    api_token:
+    apiTokenSecret:
+      name:
+      key:
     base_url: http://dependencytrack-trivy:4954
+
   oss_index:
     username:
-    token:
+    tokenSecret:
+      name:
+      key:
 
 backend:
   logLevel: INFO
@@ -60,9 +72,15 @@ backend:
 
   postgresql:
     enabled: true
-    password:
     database: dependencytrack
-    username:
+    passwordSecret:
+      name: dtrack-backend
+      key: postgresql-password
+
+    usernameSecret:
+      name: dtrack-backend
+      key: postgresql-username
+
     host: 127.0.0.1
     port: 5432
     connectionName:
@@ -127,10 +145,13 @@ trivy:
     registry: "ghcr.io"
     repository: "aquasecurity/trivy"
     tag: "0.63.0"
+
   serverToken: "todo"
+
   podSecurityContext:
     seccompProfile:
       type: RuntimeDefault
+
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
