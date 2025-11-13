@@ -1,5 +1,5 @@
 apiVersion: v2
-name: dependencytrack
+name: dtrack
 sources:
   - https://github.com/KvalitetsIT/dtrack/tree/main/charts
 description: A Helm chart for Kubernetes
