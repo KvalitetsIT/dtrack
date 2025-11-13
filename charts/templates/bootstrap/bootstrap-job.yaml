@@ -1,3 +1,4 @@
+{{- if .Values.bootstrap.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -62,41 +63,39 @@ spec:
             - name: TRIVY_BASE_URL
               value: "{{ .Values.bootstrap.trivy.base_url }}"
             {{- end }}
+          {{- if .Values.bootstrap.adminPassword.secret.name }}
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.bootstrap.adminPassword.secret.name }}
+                  key: {{ .Values.bootstrap.adminPassword.secret.key }}
+          {{- end }}
+          {{- if .Values.bootstrap.github.advisory_mirroring_token.secret.name }}
+            - name: GITHUB_ADVISORY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.bootstrap.github.advisory_mirroring_token.secret.name }}
+                  key: {{ .Values.bootstrap.github.advisory_mirroring_token.secret.key }}
+          {{- end }}
+          {{- if .Values.bootstrap.trivy.api_token.secret.name }}
+            - name: TRIVY_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.bootstrap.trivy.api_token.secret.name }}
+                  key: {{ .Values.bootstrap.trivy.api_token.secret.key }}
+          {{- end }}
+          {{- if .Values.bootstrap.oss_index.token.secret.name }}
+            - name: OSS_INDEX_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.bootstrap.oss_index.token.secret.name }}
+                  key: {{ .Values.bootstrap.oss_index.token.secret.key }}
+          {{- end }}
           envFrom:
             - secretRef:
-                name: "{{ .Release.Name }}-bootstrap-pwd"
+                name: "{{ .Release.Name }}-bootstrap-envs"
       volumes:
         - name: bootstrap
           secret:
-            secretName: "{{ .Release.Name }}-bootstrap"
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: "{{ .Release.Name }}-bootstrap-pwd"
-  labels:
-    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-    app.kubernetes.io/instance: "{{ .Release.Name }}-bootstrap"
-    app.kubernetes.io/name: {{ .Release.Name | quote }}
-type: Opaque
-stringData:
-  DEFAULT_ADMIN_PASSWORD: {{ .Values.bootstrap.defaultAdminPassword | quote }}
-  ADMIN_PASSWORD: {{ .Values.bootstrap.adminPassword | quote }}
-  GITHUB_ADVISORY_TOKEN: {{ .Values.bootstrap.github.advisory_mirroring_token | quote }}
-  TRIVY_API_TOKEN: {{ .Values.bootstrap.trivy.api_token | quote }}
-  OSS_INDEX_API_USERNAME: {{ .Values.bootstrap.oss_index.username | quote }}
-  OSS_INDEX_API_TOKEN: {{ .Values.bootstrap.oss_index.token | quote }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: "{{ .Release.Name }}-bootstrap"
-  labels:
-    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-    app.kubernetes.io/instance: "{{ .Release.Name }}-bootstrap"
-    app.kubernetes.io/name: {{ .Release.Name | quote }}
-type: Opaque
-stringData:
-  users.yaml: |
-    users:
-    {{- .Values.bootstrap.users | toYaml | nindent 6 }}
+            secretName: "{{ .Release.Name }}-bootstrap-mount"
+{{- end }}
