@@ -1,17 +1,24 @@
+{{- if .Values.frontend.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "dependencytrack-frontend.name" . }}
   labels:
     {{- include "dependencytrack-frontend.labels" . | nindent 4 }}
-  {{- if .Values.frontend.ingressAnnotations }}
+  {{- if .Values.frontend.ingress.annotations }}
   annotations:
-    {{- toYaml .Values.frontend.ingressAnnotations | nindent 4 }}
+    {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.frontend.ingressClassName }}
+  {{- if .Values.frontend.ingress.className }}
+  ingressClassName: {{ .Values.frontend.ingress.className }}
+  {{- end }}
+  {{- if .Values.frontend.ingress.tls }}
+  tls:
+    {{- toYaml .Values.frontend.ingress.tls | nindent 4 }}
+  {{- end }}
   rules:
-    - host: {{ .Values.frontend.ingress | quote }}
+    - host: {{ .Values.frontend.ingress.host | quote }}
       http:
         paths:
           - backend:
@@ -30,3 +37,4 @@ spec:
             path: {{ .Values.frontend.swagger.path }}
             pathType: Prefix
         {{- end }}
+{{- end }}

@@ -52,8 +52,12 @@ backend:
       memory: 4Gi
       cpu: "1"
   outbound: []
-  ingressAnnotations: {}
   ingress:
+    enabled: true
+    className: ""
+    annotations: {}
+    host:
+    tls: []
   livenessProbe:
     enabled: true
     path: "/api/version"
@@ -135,8 +139,12 @@ frontend:
       memory: 256Mi
       cpu: "1"
   outbound: []
-  ingressAnnotations: {}
   ingress:
+    enabled: true
+    className: ""
+    annotations: {}
+    host:
+    tls: []
   env:
     API_BASE_URL:
     OIDC_ISSUER:

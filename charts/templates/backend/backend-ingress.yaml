@@ -1,20 +1,24 @@
+{{- if .Values.backend.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "dependencytrack-backend.name" . }}
   labels:
     {{- include "dependencytrack-backend.labels" . | nindent 4 }}
+  {{- if .Values.backend.ingress.annotations }}
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 100m
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/client_max_body_size: "0"
-    {{- if .Values.backend.ingressAnnotations }}
-    {{- toYaml .Values.backend.ingressAnnotations | nindent 4 }}
-    {{- end }}
+    {{- toYaml .Values.backend.ingress.annotations | nindent 4 }}
+  {{- end }}
 spec:
-  ingressClassName: {{ .Values.backend.ingressClassName }}
+  {{- if .Values.backend.ingress.className }}
+  ingressClassName: {{ .Values.backend.ingress.className }}
+  {{- end }}
+  {{- if .Values.backend.ingress.tls }}
+  tls:
+    {{- toYaml .Values.backend.ingress.tls | nindent 4 }}
+  {{- end }}
   rules:
-    - host: {{ .Values.backend.ingress | quote }}
+    - host: {{ .Values.backend.ingress.host | quote }}
       http:
         paths:
           - backend:
@@ -24,3 +28,4 @@ spec:
                   number: 8080
             path: /
             pathType: Prefix
+{{- end }}
