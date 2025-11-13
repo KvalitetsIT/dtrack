@@ -176,6 +176,18 @@ func main() {
 			prop.PropertyValue = &download
 			cp = append(cp, prop)
 			log.Info("added: nvd api download feeds")
+
+		case "submission.enabled":
+			if *prop.GroupName == "telemetry" {
+				if isAlreadySet(prop.PropertyValue, "false") {
+					log.Info("telemetry submission already disabled")
+					continue
+				}
+				disabled := "false"
+				prop.PropertyValue = &disabled
+				cp = append(cp, prop)
+				log.Info("disabled: telemetry submission")
+			}
 		}
 
 		if cfg.GoogleOSVEnabled {
