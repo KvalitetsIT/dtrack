@@ -23,9 +23,7 @@ bootstrap:
   google:
     osv_enabled: true
 
-  users:
-    - username: console
-      password: todo
+  users: []
 
   trivy:
     ignore_unfixed: true
@@ -75,8 +73,14 @@ backend:
   postgresql:
     enabled: true
     database: dependencytrack
-    password:
-    username:
+    passwordSecret:
+      name: dtrack-backend
+      key: postgresql-password
+
+    usernameSecret:
+      name: dtrack-backend
+      key: postgresql-username
+
     host: 127.0.0.1
     port: 5432
     connectionName:
