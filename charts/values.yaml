@@ -11,18 +11,14 @@ bootstrap:
   frontendBaseUrl:
 
   defaultAdminPassword: admin
-  adminPassword:
-    value: todo
-    secret:
-      name: dtrack-bootstrap
-      key: admin-password
+  adminPasswordSecret:
+    name: dtrack-bootstrap
+    key: admin-password
 
   github:
-    advisory_mirroring_token:
-      value:
-      secret:
-        name:
-        key:
+    advisoryMirroringTokenSecret:
+      name:
+      key:
 
   google:
     osv_enabled: true
@@ -33,21 +29,16 @@ bootstrap:
 
   trivy:
     ignore_unfixed: true
-    api_token:
-      value:
-      secret:
-        name:
-        key:
-
+    apiTokenSecret:
+      name:
+      key:
     base_url: http://dependencytrack-trivy:4954
 
   oss_index:
     username:
-    token:
-      value:
-      secret:
-        name:
-        key:
+    tokenSecret:
+      name:
+      key:
 
 backend:
   logLevel: INFO

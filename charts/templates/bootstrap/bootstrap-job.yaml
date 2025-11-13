@@ -63,33 +63,33 @@ spec:
             - name: TRIVY_BASE_URL
               value: "{{ .Values.bootstrap.trivy.base_url }}"
             {{- end }}
-          {{- if .Values.bootstrap.adminPassword.secret.name }}
+          {{- if .Values.bootstrap.adminPasswordSecret.name }}
             - name: ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.bootstrap.adminPassword.secret.name }}
-                  key: {{ .Values.bootstrap.adminPassword.secret.key }}
+                  name: {{ .Values.bootstrap.adminPasswordSecret.name }}
+                  key: {{ .Values.bootstrap.adminPasswordSecret.key }}
           {{- end }}
-          {{- if .Values.bootstrap.github.advisory_mirroring_token.secret.name }}
+          {{- if .Values.bootstrap.github.advisoryMirroringTokenSecret.name }}
             - name: GITHUB_ADVISORY_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.bootstrap.github.advisory_mirroring_token.secret.name }}
-                  key: {{ .Values.bootstrap.github.advisory_mirroring_token.secret.key }}
+                  name: {{ .Values.bootstrap.github.advisoryMirroringTokenSecret.name }}
+                  key: {{ .Values.bootstrap.github.advisoryMirroringTokenSecret.key }}
           {{- end }}
-          {{- if .Values.bootstrap.trivy.api_token.secret.name }}
+          {{- if .Values.bootstrap.trivy.apiTokenSecret.name }}
             - name: TRIVY_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.bootstrap.trivy.api_token.secret.name }}
-                  key: {{ .Values.bootstrap.trivy.api_token.secret.key }}
+                  name: {{ .Values.bootstrap.trivy.apiTokenSecret.name }}
+                  key: {{ .Values.bootstrap.trivy.apiTokenSecret.key }}
           {{- end }}
-          {{- if .Values.bootstrap.oss_index.token.secret.name }}
+          {{- if .Values.bootstrap.oss_index.tokenSecret.name }}
             - name: OSS_INDEX_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.bootstrap.oss_index.token.secret.name }}
-                  key: {{ .Values.bootstrap.oss_index.token.secret.key }}
+                  name: {{ .Values.bootstrap.oss_index.tokenSecret.name }}
+                  key: {{ .Values.bootstrap.oss_index.tokenSecret.key }}
           {{- end }}
           envFrom:
             - secretRef:
