@@ -4,6 +4,10 @@ metadata:
   name: {{ include "dependencytrack-frontend.name" . }}
   labels:
     {{- include "dependencytrack-frontend.labels" . | nindent 4 }}
+  {{- if .Values.frontend.ingressAnnotations }}
+  annotations:
+    {{- toYaml .Values.frontend.ingressAnnotations | nindent 4 }}
+  {{- end }}
 spec:
   ingressClassName: {{ .Values.frontend.ingressClassName }}
   rules:
