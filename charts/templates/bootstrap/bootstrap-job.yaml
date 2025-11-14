@@ -93,9 +93,10 @@ spec:
                   name: {{ .Values.bootstrap.oss_index.tokenSecret.name }}
                   key: {{ .Values.bootstrap.oss_index.tokenSecret.key }}
           {{- end }}
+
           envFrom:
             - secretRef:
-                name: "{{ .Release.Name }}-bootstrap-envs"
+                name: "{{ .Release.Name }}-bootstrap-config"
       volumes:
         - name: bootstrap
           secret:
