@@ -82,6 +82,9 @@ func (c *managementClient) MapOidcGroupToTeam(ctx context.Context, groupUuid, te
 			case http.StatusNotModified:
 				log.Infof("OIDC group %s is already mapped to team %s", groupUuid, teamUuid)
 				return nil
+			case http.StatusConflict:
+				log.Infof("OIDC group %s is already mapped to team %s", groupUuid, teamUuid)
+				return nil
 			default:
 				return convertError(err, "MapOidcGroupToTeam", resp)
 			}
