@@ -1,0 +1,12 @@
+groups:
+  - name: developers
+    teams:
+      - Administrators
+      - Developers
+  - name: security-team
+    teams:
+      - SecurityAnalysts
+  - name: operations
+    teams:
+      - OperationsTeam
+      - Administrators

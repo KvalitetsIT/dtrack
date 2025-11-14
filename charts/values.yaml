@@ -24,6 +24,8 @@ bootstrap:
     osv_enabled: true
 
   users: []
+  teams: []
+  groups: []
 
   trivy:
     ignore_unfixed: true

@@ -1,0 +1,13 @@
+teams:
+  - name: Developers
+    permissions:
+      - VIEW_PORTFOLIO
+      - VIEW_VULNERABILITY
+  - name: SecurityAnalysts
+    permissions:
+      - VIEW_PORTFOLIO
+      - VIEW_VULNERABILITY
+      - POLICY_VIOLATION_ANALYSIS
+  - name: OperationsTeam
+    permissions:
+      - VIEW_PORTFOLIO

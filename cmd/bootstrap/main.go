@@ -25,6 +25,8 @@ type Config struct {
 	DefaultAdminPassword string `json:"default-admin-password"`
 	LogLevel             string `json:"log-level"`
 	UsersFile            string `json:"users-file"`
+	TeamsFile            string `json:"teams-file"`
+	GroupsFile           string `json:"groups-file"`
 	GithubAdvisoryToken  string `json:"github-advisory-token"`
 	GoogleOSVEnabled     bool   `json:"google-osv-enabled"`
 	TrivyApiToken        string `json:"trivy-token"`
@@ -42,6 +44,8 @@ func init() {
 	flag.StringVar(&cfg.AdminPassword, "admin-password", cfg.AdminPassword, "new admin password")
 	flag.StringVar(&cfg.GithubAdvisoryToken, "github-advisory-token", cfg.GithubAdvisoryToken, "github advisory mirroring token")
 	flag.StringVar(&cfg.UsersFile, "users-file", "/bootstrap/users.yaml", "file with users to create")
+	flag.StringVar(&cfg.TeamsFile, "teams-file", "/bootstrap/teams.yaml", "file with teams to create")
+	flag.StringVar(&cfg.GroupsFile, "groups-file", "/bootstrap/groups.yaml", "file with OIDC groups to create")
 	flag.BoolVar(&cfg.GoogleOSVEnabled, "google-osv-enabled", cfg.GoogleOSVEnabled, "enable google osv integration")
 	flag.StringVar(&cfg.TrivyApiToken, "trivy-api-token", cfg.TrivyApiToken, "trivy api token to use for scanning")
 	flag.StringVar(&cfg.TrivyBaseURL, "trivy-base-url", cfg.TrivyBaseURL, "trivy base url")
@@ -86,6 +90,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("read users file: %v", err)
 	}
+
 	type Users struct {
 		Users []*dependencytrack.AdminUser `yaml:"users"`
 	}
@@ -93,13 +98,6 @@ func main() {
 	err = yaml.Unmarshal(file, users)
 	if err != nil {
 		log.Fatalf("unmarshal users file: %v", err)
-	}
-
-	for _, u := range users.Users {
-		log.Info("User: ", u.Username)
-		if u.Password == "" {
-			log.Fatalf("user %s has no password", u.Username)
-		}
 	}
 
 	team, err := c.GetTeam(ctx, "Administrators")
@@ -126,6 +124,123 @@ func main() {
 	}
 
 	log.Info("created: users and added to Administrators team")
+
+	// Load and create teams
+	teamsFile, err := os.ReadFile(cfg.TeamsFile)
+	if err != nil {
+		log.Fatalf("read teams file: %v", err)
+	}
+
+	type TeamConfig struct {
+		Name        string                       `yaml:"name"`
+		Permissions []dependencytrack.Permission `yaml:"permissions"`
+	}
+
+	type Teams struct {
+		Teams []*TeamConfig `yaml:"teams"`
+	}
+
+	teams := &Teams{}
+	err = yaml.Unmarshal(teamsFile, teams)
+	if err != nil {
+		log.Fatalf("unmarshal teams file: %v", err)
+	}
+
+	// Get existing teams to avoid duplicates
+	existingTeams, err := c.GetTeams(ctx)
+	if err != nil {
+		log.Fatalf("get existing teams: %v", err)
+	}
+
+	existingTeamMap := make(map[string]string)
+	for _, t := range existingTeams {
+		existingTeamMap[t.Name] = t.Uuid
+	}
+
+	// Create teams that don't exist
+	for _, teamConfig := range teams.Teams {
+		if teamConfig.Name == "" {
+			log.Fatalf("team name cannot be empty")
+		}
+
+		if _, exists := existingTeamMap[teamConfig.Name]; exists {
+			log.Infof("team %s already exists", teamConfig.Name)
+		} else {
+			_, err := c.CreateTeam(ctx, teamConfig.Name, teamConfig.Permissions)
+			if err != nil {
+				log.Fatalf("create team %s: %v", teamConfig.Name, err)
+			}
+		}
+	}
+
+	log.Info("done: teams created")
+
+	// Load and process OIDC groups
+	groupsFile, err := os.ReadFile(cfg.GroupsFile)
+	if err != nil {
+		log.Fatalf("read groups file: %v", err)
+	}
+
+	type OidcGroupConfig struct {
+		Name  string   `yaml:"name"`
+		Teams []string `yaml:"teams"`
+	}
+
+	type OidcGroups struct {
+		Groups []*OidcGroupConfig `yaml:"groups"`
+	}
+
+	oidcGroups := &OidcGroups{}
+	err = yaml.Unmarshal(groupsFile, oidcGroups)
+	if err != nil {
+		log.Fatalf("unmarshal groups file: %v", err)
+	}
+
+	// Get existing OIDC groups
+	existingGroups, err := c.GetOidcGroups(ctx)
+	if err != nil {
+		log.Fatalf("get existing OIDC groups: %v", err)
+	}
+
+	existingGroupMap := make(map[string]string)
+	for _, g := range existingGroups {
+		existingGroupMap[g.Name] = g.Uuid
+	}
+
+	// Create OIDC groups and map to teams
+	for _, groupConfig := range oidcGroups.Groups {
+		if groupConfig.Name == "" {
+			log.Fatalf("OIDC group name cannot be empty")
+		}
+
+		var groupUuid string
+		if uuid, exists := existingGroupMap[groupConfig.Name]; exists {
+			log.Infof("OIDC group %s already exists with UUID %s", groupConfig.Name, uuid)
+			groupUuid = uuid
+		} else {
+			// Create the OIDC group
+			group, err := c.CreateOidcGroup(ctx, groupConfig.Name)
+			if err != nil {
+				log.Fatalf("create OIDC group %s: %v", groupConfig.Name, err)
+			}
+			groupUuid = group.Uuid
+		}
+
+		for _, teamName := range groupConfig.Teams {
+			team, err := c.GetTeam(ctx, teamName)
+			if err != nil {
+				log.Fatalf("get team %s for OIDC group mapping: %v", teamName, err)
+			}
+
+			err = c.MapOidcGroupToTeam(ctx, groupUuid, team.Uuid)
+			if err != nil {
+				log.Fatalf("map OIDC group %s to team %s: %v", groupConfig.Name, teamName, err)
+			}
+			log.Infof("mapped OIDC group %s to team %s", groupConfig.Name, teamName)
+		}
+	}
+
+	log.Info("done: OIDC groups created and mapped to teams")
 
 	props, err := c.GetConfigProperties(ctx)
 	if err != nil {

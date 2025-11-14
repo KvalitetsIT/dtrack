@@ -37,19 +37,24 @@ type ManagementClient interface {
 	ConfigPropertyAggregate(ctx context.Context, property ConfigProperty) error
 	CreateAdminUser(ctx context.Context, username string, password auth.Password, teamUuid string) error
 	CreateAdminUsers(ctx context.Context, users []*AdminUser, teamUuid string) error
+	CreateOidcGroup(ctx context.Context, groupName string) (*OidcGroup, error)
 	CreateOidcUser(ctx context.Context, email string) error
 	CreateTeam(ctx context.Context, teamName string, permissions []Permission) (*Team, error)
 	DeleteManagedUser(ctx context.Context, username string) error
+	DeleteOidcGroup(ctx context.Context, uuid string) error
 	DeleteOidcUser(ctx context.Context, username string) error
 	DeleteTeam(ctx context.Context, uuid string) error
 	DeleteUserMembership(ctx context.Context, teamUuid, username string) error
 	GenerateApiKey(ctx context.Context, uuid string) (string, error)
 	GetConfigProperties(ctx context.Context) ([]ConfigProperty, error)
 	GetEcosystems(ctx context.Context) ([]string, error)
+	GetOidcGroup(ctx context.Context, groupName string) (*OidcGroup, error)
+	GetOidcGroups(ctx context.Context) ([]*OidcGroup, error)
 	GetOidcUser(ctx context.Context, username string) (*User, error)
 	GetOidcUsers(ctx context.Context) ([]*User, error)
 	GetTeam(ctx context.Context, team string) (*Team, error)
 	GetTeams(ctx context.Context) ([]*Team, error)
+	MapOidcGroupToTeam(ctx context.Context, groupUuid, teamUuid string) error
 	ProjectMetricsRefresh(ctx context.Context, uuid string) error
 	RemoveAdminUser(ctx context.Context, username string) error
 	RemoveAdminUsers(ctx context.Context, users []*AdminUser) error
