@@ -67,16 +67,18 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels for backend
 */}}
 {{- define "dependencytrack-backend.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "dependencytrack.name" . }}
-app.kubernetes.io/instance: {{ include "dependencytrack-backend.name" . }}
+app.kubernetes.io/name: {{ include "dependencytrack-backend.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: backend
 {{- end }}
 
 {{/*
 Selector labels for frontend
 */}}
 {{- define "dependencytrack-frontend.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "dependencytrack.name" . }}
-app.kubernetes.io/instance: {{ include "dependencytrack-frontend.name" . }}
+app.kubernetes.io/name: {{ include "dependencytrack-frontend.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: frontend
 {{- end }}
 
 {{/*

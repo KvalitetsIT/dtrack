@@ -4,10 +4,11 @@ kind: Job
 metadata:
   name: "{{ .Release.Name }}-bootstrap"
   labels:
-    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-    app.kubernetes.io/instance: "{{ .Release.Name }}-bootstrap"
-    app.kubernetes.io/name: {{ .Release.Name | quote }}
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/name: {{ include "dependencytrack.name" . }}-bootstrap
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: bootstrap
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "dependencytrack.chart" . }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -21,10 +22,11 @@ spec:
     metadata:
       name: "{{ .Release.Name }}-bootstrap"
       labels:
-        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-        app.kubernetes.io/instance: "{{ .Release.Name }}-bootstrap"
-        app.kubernetes.io/name: {{ .Release.Name | quote }}
-        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app.kubernetes.io/name: {{ include "dependencytrack.name" . }}-bootstrap
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: bootstrap
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        helm.sh/chart: {{ include "dependencytrack.chart" . }}
     spec:
       restartPolicy: Never
       securityContext:
