@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -86,161 +87,21 @@ func main() {
 		log.Fatalf("change admin password: %v", err)
 	}
 
-	file, err := os.ReadFile(cfg.UsersFile)
-	if err != nil {
-		log.Fatalf("read users file: %v", err)
+	// Bootstrap users
+	if err := bootstrapUsers(ctx, c, cfg.UsersFile, log); err != nil {
+		log.Fatalf("bootstrap users: %v", err)
 	}
 
-	type Users struct {
-		Users []*dependencytrack.AdminUser `yaml:"users"`
-	}
-	users := &Users{}
-	err = yaml.Unmarshal(file, users)
-	if err != nil {
-		log.Fatalf("unmarshal users file: %v", err)
+	// Bootstrap teams
+	// This is important to do before OIDC groups as they are mapped to teams
+	if err := bootstrapTeams(ctx, c, cfg.TeamsFile, log); err != nil {
+		log.Fatalf("bootstrap teams: %v", err)
 	}
 
-	team, err := c.GetTeam(ctx, "Administrators")
-	if err != nil {
-		log.Fatalf("get team uuid: %v", err)
+	// Bootstrap OIDC groups
+	if err := bootstrapOidcGroups(ctx, c, cfg.GroupsFile, log); err != nil {
+		log.Fatalf("bootstrap OIDC groups: %v", err)
 	}
-
-	if len(team.ApiKeys) == 0 {
-		_, err = c.GenerateApiKey(ctx, team.Uuid)
-		if err != nil {
-			log.Fatalf("generate api key: %v", err)
-		}
-	}
-
-	// remove users before adding to ensure passwords in sync
-	err = c.RemoveAdminUsers(ctx, users.Users)
-	if err != nil {
-		log.Fatalf("remove users: %v", err)
-	}
-
-	err = c.CreateAdminUsers(ctx, users.Users, team.Uuid)
-	if err != nil {
-		log.Fatalf("create users: %v", err)
-	}
-
-	log.Info("created: users and added to Administrators team")
-
-	// Load and create teams
-	teamsFile, err := os.ReadFile(cfg.TeamsFile)
-	if err != nil {
-		log.Fatalf("read teams file: %v", err)
-	}
-
-	type TeamConfig struct {
-		Name        string                       `yaml:"name"`
-		Permissions []dependencytrack.Permission `yaml:"permissions"`
-	}
-
-	type Teams struct {
-		Teams []*TeamConfig `yaml:"teams"`
-	}
-
-	teams := &Teams{}
-	err = yaml.Unmarshal(teamsFile, teams)
-	if err != nil {
-		log.Fatalf("unmarshal teams file: %v", err)
-	}
-
-	// Get existing teams to avoid duplicates
-	existingTeams, err := c.GetTeams(ctx)
-	if err != nil {
-		log.Fatalf("get existing teams: %v", err)
-	}
-
-	existingTeamMap := make(map[string]string)
-	for _, t := range existingTeams {
-		existingTeamMap[t.Name] = t.Uuid
-	}
-
-	// Create teams that don't exist
-	for _, teamConfig := range teams.Teams {
-		if teamConfig.Name == "" {
-			log.Fatalf("team name cannot be empty")
-		}
-
-		if _, exists := existingTeamMap[teamConfig.Name]; exists {
-			log.Infof("team %s already exists", teamConfig.Name)
-		} else {
-			_, err := c.CreateTeam(ctx, teamConfig.Name, teamConfig.Permissions)
-			if err != nil {
-				log.Fatalf("create team %s: %v", teamConfig.Name, err)
-			}
-		}
-	}
-
-	log.Info("done: teams created")
-
-	// Load and process OIDC groups
-	groupsFile, err := os.ReadFile(cfg.GroupsFile)
-	if err != nil {
-		log.Fatalf("read groups file: %v", err)
-	}
-
-	type OidcGroupConfig struct {
-		Name  string   `yaml:"name"`
-		Teams []string `yaml:"teams"`
-	}
-
-	type OidcGroups struct {
-		Groups []*OidcGroupConfig `yaml:"groups"`
-	}
-
-	oidcGroups := &OidcGroups{}
-	err = yaml.Unmarshal(groupsFile, oidcGroups)
-	if err != nil {
-		log.Fatalf("unmarshal groups file: %v", err)
-	}
-
-	// Get existing OIDC groups
-	existingGroups, err := c.GetOidcGroups(ctx)
-	if err != nil {
-		log.Fatalf("get existing OIDC groups: %v", err)
-	}
-
-	existingGroupMap := make(map[string]string)
-	for _, g := range existingGroups {
-		existingGroupMap[g.Name] = g.Uuid
-	}
-
-	// Create OIDC groups and map to teams
-	for _, groupConfig := range oidcGroups.Groups {
-		if groupConfig.Name == "" {
-			log.Fatalf("OIDC group name cannot be empty")
-		}
-
-		var groupUuid string
-		if uuid, exists := existingGroupMap[groupConfig.Name]; exists {
-			log.Infof("OIDC group %s already exists with UUID %s", groupConfig.Name, uuid)
-			groupUuid = uuid
-		} else {
-			// Create the OIDC group
-			group, err := c.CreateOidcGroup(ctx, groupConfig.Name)
-			if err != nil {
-				log.Fatalf("create OIDC group %s: %v", groupConfig.Name, err)
-			}
-			groupUuid = group.Uuid
-		}
-
-		for _, teamName := range groupConfig.Teams {
-			team, err := c.GetTeam(ctx, teamName)
-			if err != nil {
-				log.Fatalf("get team %s for OIDC group mapping: %v", teamName, err)
-			}
-
-			err = c.MapOidcGroupToTeam(ctx, groupUuid, team.Uuid)
-			if err != nil {
-				log.Fatalf("map OIDC group %s to team %s: %v", groupConfig.Name, teamName, err)
-			}
-			log.Infof("mapped OIDC group %s to team %s", groupConfig.Name, teamName)
-		}
-	}
-
-	log.Info("done: OIDC groups created and mapped to teams")
 
 	props, err := c.GetConfigProperties(ctx)
 	if err != nil {
@@ -453,6 +314,179 @@ func updateEcosystems(ctx context.Context, c dependencytrack.ManagementClient, e
 
 		log.Info("Chunk processed and sent. Remaining items:", len(eco))
 	}
+	return nil
+}
+
+func bootstrapUsers(ctx context.Context, c dependencytrack.ManagementClient, usersFilePath string, log *logrus.Logger) error {
+	file, err := os.ReadFile(usersFilePath)
+	if err != nil {
+		return fmt.Errorf("read users file: %w", err)
+	}
+
+	type Users struct {
+		Users []*dependencytrack.AdminUser `yaml:"users"`
+	}
+	users := &Users{}
+	if err := yaml.Unmarshal(file, users); err != nil {
+		return fmt.Errorf("unmarshal users file: %w", err)
+	}
+
+	team, err := c.GetTeam(ctx, "Administrators")
+	if err != nil {
+		return fmt.Errorf("get team uuid: %w", err)
+	}
+
+	if len(team.ApiKeys) == 0 {
+		_, err = c.GenerateApiKey(ctx, team.Uuid)
+		if err != nil {
+			return fmt.Errorf("generate api key: %w", err)
+		}
+	}
+
+	// remove users before adding to ensure passwords in sync
+	if err := c.RemoveAdminUsers(ctx, users.Users); err != nil {
+		return fmt.Errorf("remove users: %w", err)
+	}
+
+	if err := c.CreateAdminUsers(ctx, users.Users, team.Uuid); err != nil {
+		return fmt.Errorf("create users: %w", err)
+	}
+
+	log.Info("created: users and added to Administrators team")
+	return nil
+}
+
+func bootstrapTeams(ctx context.Context, c dependencytrack.ManagementClient, teamsFilePath string, log *logrus.Logger) error {
+	teamsFile, err := os.ReadFile(teamsFilePath)
+	if err != nil {
+		return fmt.Errorf("read teams file: %w", err)
+	}
+
+	type TeamConfig struct {
+		Name        string                       `yaml:"name"`
+		Permissions []dependencytrack.Permission `yaml:"permissions"`
+	}
+
+	type Teams struct {
+		Teams []*TeamConfig `yaml:"teams"`
+	}
+
+	teams := &Teams{}
+	if err := yaml.Unmarshal(teamsFile, teams); err != nil {
+		return fmt.Errorf("unmarshal teams file: %w", err)
+	}
+
+	// Get existing teams to avoid duplicates
+	existingTeams, err := c.GetTeams(ctx)
+	if err != nil {
+		return fmt.Errorf("get existing teams: %w", err)
+	}
+
+	existingTeamMap := make(map[string]string)
+	for _, t := range existingTeams {
+		existingTeamMap[t.Name] = t.Uuid
+	}
+
+	// Create teams that don't exist
+	for _, teamConfig := range teams.Teams {
+		if teamConfig.Name == "" {
+			return fmt.Errorf("team name cannot be empty")
+		}
+
+		if _, exists := existingTeamMap[teamConfig.Name]; exists {
+			log.Infof("team %s already exists", teamConfig.Name)
+		} else {
+			_, err := c.CreateTeam(ctx, teamConfig.Name, teamConfig.Permissions)
+			if err != nil {
+				return fmt.Errorf("create team %s: %w", teamConfig.Name, err)
+			}
+		}
+	}
+
+	log.Info("done: teams created")
+	return nil
+}
+
+func bootstrapOidcGroups(ctx context.Context, c dependencytrack.ManagementClient, groupsFilePath string, log *logrus.Logger) error {
+	groupsFile, err := os.ReadFile(groupsFilePath)
+	if err != nil {
+		return fmt.Errorf("read groups file: %w", err)
+	}
+
+	type OidcGroupConfig struct {
+		Name  string   `yaml:"name"`
+		Teams []string `yaml:"teams"`
+	}
+
+	type OidcGroups struct {
+		Groups []*OidcGroupConfig `yaml:"groups"`
+	}
+
+	oidcGroups := &OidcGroups{}
+	if err := yaml.Unmarshal(groupsFile, oidcGroups); err != nil {
+		return fmt.Errorf("unmarshal groups file: %w", err)
+	}
+
+	// Get existing OIDC groups
+	existingGroups, err := c.GetOidcGroups(ctx)
+	if err != nil {
+		return fmt.Errorf("get existing OIDC groups: %w", err)
+	}
+
+	existingGroupMap := make(map[string]string)
+	for _, g := range existingGroups {
+		existingGroupMap[g.Name] = g.Uuid
+	}
+
+	// Build map of groups from config file
+	configGroupMap := make(map[string]bool)
+	for _, groupConfig := range oidcGroups.Groups {
+		configGroupMap[groupConfig.Name] = true
+	}
+
+	// Delete OIDC groups that are not in the config file
+	for _, existingGroup := range existingGroups {
+		if !configGroupMap[existingGroup.Name] {
+			if err := c.DeleteOidcGroup(ctx, existingGroup.Uuid); err != nil {
+				return fmt.Errorf("delete OIDC group %s: %w", existingGroup.Name, err)
+			}
+			log.Infof("deleted OIDC group %s (not in config)", existingGroup.Name)
+		}
+	}
+
+	// Create OIDC groups and map to teams
+	for _, groupConfig := range oidcGroups.Groups {
+		if groupConfig.Name == "" {
+			return fmt.Errorf("OIDC group name cannot be empty")
+		}
+
+		var groupUuid string
+		if uuid, exists := existingGroupMap[groupConfig.Name]; exists {
+			log.Infof("OIDC group %s already exists with UUID %s", groupConfig.Name, uuid)
+			groupUuid = uuid
+		} else {
+			// Create the OIDC group
+			group, err := c.CreateOidcGroup(ctx, groupConfig.Name)
+			if err != nil {
+				return fmt.Errorf("create OIDC group %s: %w", groupConfig.Name, err)
+			}
+			groupUuid = group.Uuid
+		}
+
+		for _, teamName := range groupConfig.Teams {
+			team, err := c.GetTeam(ctx, teamName)
+			if err != nil {
+				return fmt.Errorf("get team %s for OIDC group mapping: %w", teamName, err)
+			}
+
+			if err := c.MapOidcGroupToTeam(ctx, groupUuid, team.Uuid); err != nil {
+				return fmt.Errorf("map OIDC group %s to team %s: %w", groupConfig.Name, teamName, err)
+			}
+			log.Infof("mapped OIDC group %s to team %s", groupConfig.Name, teamName)
+		}
+	}
+
+	log.Info("done: OIDC groups created and mapped to teams")
 	return nil
 }
 
