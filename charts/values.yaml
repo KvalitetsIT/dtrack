@@ -91,6 +91,10 @@ backend:
     connectionName:
     ip:
 
+  secretKeySecret:
+    name: ""
+    key: secret.key
+
   serviceAccount:
     create: true
 

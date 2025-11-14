@@ -28,7 +28,7 @@ spec:
           emptyDir: { }
         - name: secret-key
           secret:
-            secretName: {{ .Release.Name }}-secret-key
+            secretName: {{ required "Backend secret key secret name is required" .Values.backend.secretKeySecret.name }}
       securityContext:
         seccompProfile:
           type: RuntimeDefault
