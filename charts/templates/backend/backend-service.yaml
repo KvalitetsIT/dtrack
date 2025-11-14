@@ -13,4 +13,4 @@ spec:
       name: http-metrics
       targetPort: http-metrics
   selector:
-    app.kubernetes.io/instance: {{ include "dependencytrack-backend.name" . }}
+    {{- include "dependencytrack-backend.selectorLabels" . | nindent 4 }}
