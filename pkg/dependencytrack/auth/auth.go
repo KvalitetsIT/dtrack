@@ -16,6 +16,7 @@ import (
 
 var (
 	_ Auth = &usernamePasswordSource{}
+	_ Auth = &apiTokenSource{}
 )
 
 type Auth interface {
@@ -109,6 +110,29 @@ func (ups *usernamePasswordSource) Login(ctx context.Context, username Username,
 
 	ups.log.Info("Successfully logged in with username and password")
 	return res, nil
+}
+
+type apiTokenSource struct {
+	apiToken string
+}
+
+func NewApiTokenSource(apiToken string) Auth {
+	return &apiTokenSource{
+		apiToken: apiToken,
+	}
+}
+
+func (ats *apiTokenSource) AuthContext(ctx context.Context) (context.Context, error) {
+	apiKeys := map[string]client.APIKey{
+		"X-Api-Key": {
+			Key: ats.apiToken,
+		},
+	}
+	return context.WithValue(ctx, client.ContextAPIKeys, apiKeys), nil
+}
+
+func (ats *apiTokenSource) Login(ctx context.Context, username, password string) (string, error) {
+	return "", errors.New("Login not supported for API token authentication")
 }
 
 type ClientError struct {

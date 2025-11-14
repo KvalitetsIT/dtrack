@@ -105,6 +105,27 @@ func NewClient(url string, username auth.Username, password auth.Password, log *
 	}, nil
 }
 
+func NewApiClient(url string, apiToken string, log *logrus.Entry, options ...Option) (Client, error) {
+	if url == "" {
+		return nil, fmt.Errorf("NewApiClient: URL cannot be empty")
+	}
+	if apiToken == "" {
+		return nil, fmt.Errorf("NewApiClient: API token cannot be empty")
+	}
+	opts := &Options{}
+	for _, opt := range options {
+		opt(opts)
+	}
+
+	clientConfig := setupConfig(url, opts)
+	apiClient := client.NewAPIClient(clientConfig)
+	return &dependencyTrackClient{
+		client: apiClient,
+		auth:   auth.NewApiTokenSource(apiToken),
+		log:    log,
+	}, nil
+}
+
 func NewManagementClient(url string, username auth.Username, password auth.Password, log *logrus.Entry, options ...Option) (ManagementClient, error) {
 	if url == "" {
 		return nil, fmt.Errorf("NewClient: URL cannot be empty")
